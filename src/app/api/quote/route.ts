@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const url = `https://sqsprod.osmosis.zone/router/custom-direct-quote?tokenIn=${amountIn}${encodeURIComponent(denomIn)}&tokenOutDenom=${encodeURIComponent(denomOut)}&poolID=${poolId}`
+  const url = `https://sqs.osmosis.zone/router/custom-direct-quote?tokenIn=${amountIn}${encodeURIComponent(denomIn)}&tokenOutDenom=${encodeURIComponent(denomOut)}&poolID=${poolId}`
 
   try {
     const response = await fetch(url)

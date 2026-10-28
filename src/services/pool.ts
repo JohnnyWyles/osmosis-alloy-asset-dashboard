@@ -436,29 +436,30 @@ const calculdateAlloyAssetDenom = (
 }
 
 export const getPoolInOutTxs = cache(async (poolId: string) => {
-  // Determine the block height ~24h ago from the LCD's latest block.
+  // Determine the block height ~24h ago from the RPC's latest block. The LCD's
+  // tendermint block routes answer 403, so the height comes from RPC /status.
   // (The previous AllesLabs GraphQL block-height lookup was removed: that host
   // no longer resolves. Osmosis produces ~72,000 blocks/day at ~1.2s each.)
   const BLOCKS_PER_DAY = 72000
   let height: number
   try {
     const heightResponse = await fetchWithRetry(
-      "https://lcd.osmosis.zone/cosmos/base/tendermint/v1beta1/blocks/latest"
+      "https://rpc.osmosis.zone/status"
     )
 
     if (!heightResponse.ok) {
-      throw new Error(`LCD endpoint returned ${heightResponse.status}`)
+      throw new Error(`RPC endpoint returned ${heightResponse.status}`)
     }
 
     const heightData = await heightResponse.json()
-    const currentHeight = Number(heightData.block.header.height)
+    const currentHeight = Number(heightData.result.sync_info.latest_block_height)
     height = currentHeight - BLOCKS_PER_DAY
   } catch (fallbackError) {
     console.error(
-      "Failed to fetch block height from LCD endpoint",
+      "Failed to fetch block height from RPC endpoint",
       fallbackError
     )
-    throw new Error("Unable to determine block height: LCD endpoint failed")
+    throw new Error("Unable to determine block height: RPC endpoint failed")
   }
 
   try {
